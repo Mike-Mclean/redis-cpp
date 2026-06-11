@@ -56,6 +56,7 @@ int main(int argc, char **argv) {
   const char *response = "+PONG\r\n";
   send(client_fd, response, strlen(response), 0);
 
+  close(client_fd);
   close(server_fd);
 
   return 0;
