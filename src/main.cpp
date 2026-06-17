@@ -8,6 +8,21 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+void handle_client(int client_fd) {
+  char buffer[1024];
+  std::cout << "[Thread " << std::this_thread::get_id() <<"] Client Conneted via socket: " << client_fd << std::endl;
+
+  std::memset(buffer, 0, sizeof(buffer));
+  int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
+  if (bytes_received <= 0){
+    break;
+  }
+
+  const char *response = "+PONG\r\n";
+  send(client_fd, response, strlen(response), 0);
+  close(client_fd);
+}
+
 int main(int argc, char **argv) {
   // Flush after every std::cout / std::cerr
   std::cout << std::unitbuf;
@@ -43,29 +58,21 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  struct sockaddr_in client_addr;
-  int client_addr_len = sizeof(client_addr);
-  std::cout << "Waiting for a client to connect...\n";
-
-  // You can use print statements as follows for debugging, they'll be visible when running tests.
-  std::cout << "Logs from your program will appear here!\n";
-
-  int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
-  std::cout << "Client connected\n";
-
-  char buffer[1024];
   while(true){
-    int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
-    if (bytes_received <= 0){
-      break;
-    }
+    struct sockaddr_in client_addr;
+    int client_addr_len = sizeof(client_addr);
+    std::cout << "Waiting for a client to connect...\n";
 
-    const char *response = "+PONG\r\n";
-    send(client_fd, response, strlen(response), 0);
+    // You can use print statements as follows for debugging, they'll be visible when running tests.
+    std::cout << "Logs from your program will appear here!\n";
+
+    int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
+
+    std::thread worker(handle_client, client_fd)
+    worker.detach();
 
   }
 
-  close(client_fd);
 
   close(server_fd);
 
