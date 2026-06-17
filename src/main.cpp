@@ -13,14 +13,16 @@ void handle_client(int client_fd) {
   char buffer[1024];
   std::cout << "[Thread " << std::this_thread::get_id() <<"] Client Conneted via socket: " << client_fd << std::endl;
 
-  std::memset(buffer, 0, sizeof(buffer));
-  int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
-  if (bytes_received <= 0){
-    std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
-  }
+  while(true){
+    std::memset(buffer, 0, sizeof(buffer));
+    int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
+    if (bytes_received <= 0){
+      std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
+    }
 
-  const char *response = "+PONG\r\n";
-  send(client_fd, response, strlen(response), 0);
+    const char *response = "+PONG\r\n";
+    send(client_fd, response, strlen(response), 0);
+  }
   close(client_fd);
 }
 
