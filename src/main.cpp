@@ -16,7 +16,7 @@ void handle_client(int client_fd) {
   std::memset(buffer, 0, sizeof(buffer));
   int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
   if (bytes_received <= 0){
-    std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured"
+    std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
   }
 
   const char *response = "+PONG\r\n";
