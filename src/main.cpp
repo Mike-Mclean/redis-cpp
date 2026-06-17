@@ -16,7 +16,7 @@ void handle_client(int client_fd) {
   std::memset(buffer, 0, sizeof(buffer));
   int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
   if (bytes_received <= 0){
-    break;
+    std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured"
   }
 
   const char *response = "+PONG\r\n";
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 
     int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
 
-    std::thread worker(handle_client, client_fd)
+    std::thread worker(handle_client, client_fd);
     worker.detach();
 
   }
