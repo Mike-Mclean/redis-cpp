@@ -63,8 +63,8 @@ void handle_client(int client_fd)
     }
 
     std::vector<std::string> message {buffer};
-    std::string *response {echo_command(message)};
-    send(client_fd, response, strlen(response), 0);
+    std::string response {echo_command(message)};
+    send(client_fd, response, response.length(), 0);
   }
   close(client_fd);
 }
