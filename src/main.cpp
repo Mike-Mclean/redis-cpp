@@ -10,6 +10,7 @@
 #include <netdb.h>
 #include <vector>
 #include <algorithm>
+#include <string_view>
 
 std::vector<std::string> parse_bulk_string(const std::string& message)
 {
@@ -61,12 +62,22 @@ void handle_client(int client_fd)
     if (bytes_received <= 0){
       std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
     }
-    std::cout << "Processing message..." << std::endl;
-    std::vector<std::string> message {parse_bulk_string(buffer)};
-    std::string response {echo_command(message)};
-    std::cout << response << std::endl;
-    send(client_fd, response.c_str(), response.size(), 0);
+
+    std::string_view sv_buffer(buffer);
+    if (sv_buffer.starts_with("PING"))
+    {
+      std::cout << "Ping request..." << std::endl;
+      const char *response = "+PONG\r\n";
+      send(client_fd, response, strlen(response), 0);
+    } else {
+      std::cout << "Processing message..." << std::endl;
+      std::vector<std::string> message {parse_bulk_string(buffer)};
+      std::string response {echo_command(message)};
+      std::cout << response << std::endl;
+      send(client_fd, response.c_str(), response.size(), 0);
+    }
   }
+
   close(client_fd);
 }
 
