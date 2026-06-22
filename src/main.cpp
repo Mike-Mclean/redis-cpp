@@ -40,8 +40,8 @@ std::string echo_command(std::vector<std::string>& parsed_message)
 
   auto it {std::find(parsed_message.begin(), parsed_message.end(), echo)};
 
-  if (++it != parsed_message.end()){
-    size_t index = std::distance(parsed_message.begin(), it);
+  if (it != parsed_message.end()){
+    size_t index = std::distance(parsed_message.begin(), ++it);
     for (index; index < parsed_message.size(); index++)
     {
         response += parsed_message[index] + padding;
