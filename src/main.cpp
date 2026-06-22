@@ -64,6 +64,7 @@ void handle_client(int client_fd)
     }
 
     std::string_view sv_buffer(buffer);
+    std::cout << sv_buffer << std::endl;
     if (sv_buffer.starts_with("PING"))
     {
       std::cout << "Ping request..." << std::endl;
