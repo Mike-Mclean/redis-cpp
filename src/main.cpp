@@ -45,16 +45,16 @@ std::string echo_command(const std::vector<std::string>& parsed_message, size_t 
   return response;
 }
 
-std::string handle_received(std::vector<std::string> parsed_command_string)
+std::string handle_received(std::vector<std::string> parsed_received_message)
 {
 
   std::string response {};
 
   std::string echo {"ECHO"};
-  auto has_echo {std::find(parsed_message.begin(), parsed_message.end(), echo)};
+  auto has_echo {std::find(parsed_received_message.begin(), parsed_received_message.end(), echo)};
 
-  if (has_echo != parsed_message.end()){
-    size_t index = std::distance(parsed_message.begin(), ++has_echo);
+  if (has_echo != parsed_received_message.end()){
+    size_t index = std::distance(parsed_received_message.begin(), ++has_echo);
     response = echo_command(parsed_command_string, index);
   } else {
     response = "+PONG\r\n";
