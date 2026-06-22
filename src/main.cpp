@@ -32,20 +32,30 @@ std::vector<std::string> parse_bulk_string(const std::string& message)
   return message_details;
 }
 
-std::string echo_command(std::vector<std::string>& parsed_message)
+std::string echo_command(const std::vector<std::string>& parsed_message, size_t index)
 {
   std::string padding {"\r\n"};
-  std::string echo {"ECHO"};
   std::string response {};
 
-  auto it {std::find(parsed_message.begin(), parsed_message.end(), echo)};
+  for (index; index < parsed_message.size(); index++)
+  {
+    response += parsed_message[index] + padding;
+  }
 
-  if (it != parsed_message.end()){
-    size_t index = std::distance(parsed_message.begin(), ++it);
-    for (index; index < parsed_message.size(); index++)
-    {
-        response += parsed_message[index] + padding;
-    }
+  return response;
+}
+
+std::string handle_received(std::vector<std::string> parsed_command_string)
+{
+
+  std::string response {};
+
+  std::string echo {"ECHO"};
+  auto has_echo {std::find(parsed_message.begin(), parsed_message.end(), echo)};
+
+  if (has_echo != parsed_message.end()){
+    size_t index = std::distance(parsed_message.begin(), ++has_echo);
+    response = echo_command(parsed_command_string, index);
   } else {
     response = "+PONG\r\n";
   }
@@ -65,12 +75,9 @@ void handle_client(int client_fd)
       std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
     }
 
-    std::string_view sv_buffer(buffer);
-    std::cout << sv_buffer << std::endl;
-
     std::cout << "Processing message..." << std::endl;
     std::vector<std::string> message {parse_bulk_string(buffer)};
-    std::string response {echo_command(message)};
+    std::string response {handle_received(message)};
     std::cout << response << std::endl;
     send(client_fd, response.c_str(), response.size(), 0);
 
