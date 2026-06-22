@@ -31,11 +31,11 @@ std::vector<std::string> parse_bulk_string(const std::string& message)
   return message_details;
 }
 
-std::string* echo_command(std::vector<std::string>& parsed_message)
+std::string echo_command(std::vector<std::string>& parsed_message)
 {
   std::string padding {"\r\n"};
   std::string echo {"ECHO"};
-  std::string* response {};
+  std::string response {};
 
   auto it {std::find(parsed_message.begin(), parsed_message.end(), echo)};
 
@@ -63,8 +63,9 @@ void handle_client(int client_fd)
     }
 
     std::vector<std::string> message {buffer};
-    std::string *response {echo_command(message)};
-    send(client_fd, response, response.length(), 0);
+    std::string response {echo_command(message)};
+    std::string* echo = &response;
+    send(client_fd, echo, (*echo).length(), 0);
   }
   close(client_fd);
 }
