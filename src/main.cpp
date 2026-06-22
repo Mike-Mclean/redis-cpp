@@ -55,7 +55,7 @@ std::string handle_received(std::vector<std::string> parsed_received_message)
 
   if (has_echo != parsed_received_message.end()){
     size_t index = std::distance(parsed_received_message.begin(), ++has_echo);
-    response = echo_command(parsed_command_string, index);
+    response = echo_command(parsed_received_message, index);
   } else {
     response = "+PONG\r\n";
   }
