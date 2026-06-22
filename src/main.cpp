@@ -8,9 +8,50 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <vector>
+#include <algorithm>
 
+std::vector<std::string> parse_bulk_string(const std::string& message)
+{
+  std::string delimiter {"\r\n"};
+  std::vector<std::string> message_details;
 
-void handle_client(int client_fd) {
+  size_t start {0};
+  std::string token {};
+  size_t pos {message.find(delimiter, start)};
+
+  while (pos != std::string::npos)
+  {
+    token = message.substr(start, (pos - start));
+    message_details.push_back(token);
+    start = pos + delimiter.length();
+    pos = message.find(delimiter, start);
+  }
+
+  return message_details;
+}
+
+std::string echo_command(std::vector<std::string>& parsed_message)
+{
+  std::string padding {"\r\n"};
+  std::string echo {"ECHO"};
+  std::string response {};
+
+  auto it {std::find(parsed_message.begin(), parsed_message.end(), echo)};
+
+  if (++it != parsed_message.end()){
+    size_t index = std::distance(parsed_message.begin(), it);
+    for (index; index < parsed_message.size(); index++)
+    {
+        response += parsed_message[index] + padding;
+    }
+  }
+
+  return response;
+}
+
+void handle_client(int client_fd)
+{
   char buffer[1024];
   std::cout << "[Thread " << std::this_thread::get_id() <<"] Client Conneted via socket: " << client_fd << std::endl;
 
@@ -21,7 +62,8 @@ void handle_client(int client_fd) {
       std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
     }
 
-    const char *response = "+PONG\r\n";
+    std::vector<std::string> message {buffer};
+    std::string *response {echo_command(message)};
     send(client_fd, response, strlen(response), 0);
   }
   close(client_fd);
