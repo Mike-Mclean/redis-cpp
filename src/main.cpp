@@ -65,8 +65,7 @@ void handle_client(int client_fd)
     std::vector<std::string> message {parse_bulk_string(buffer)};
     std::string response {echo_command(message)};
     std::cout << response << std::endl;
-    std::string* echo = &response;
-    send(client_fd, echo, (*echo).length(), 0);
+    send(client_fd, response.c_str(), response.size(), 0);
   }
   close(client_fd);
 }
