@@ -46,6 +46,8 @@ std::string echo_command(std::vector<std::string>& parsed_message)
     {
         response += parsed_message[index] + padding;
     }
+  } else {
+    response = "PONG";
   }
 
   return response;
@@ -65,18 +67,13 @@ void handle_client(int client_fd)
 
     std::string_view sv_buffer(buffer);
     std::cout << sv_buffer << std::endl;
-    if (sv_buffer.starts_with("PING"))
-    {
-      std::cout << "Ping request..." << std::endl;
-      const char *response = "+PONG\r\n";
-      send(client_fd, response, strlen(response), 0);
-    } else {
-      std::cout << "Processing message..." << std::endl;
-      std::vector<std::string> message {parse_bulk_string(buffer)};
-      std::string response {echo_command(message)};
-      std::cout << response << std::endl;
-      send(client_fd, response.c_str(), response.size(), 0);
-    }
+
+    std::cout << "Processing message..." << std::endl;
+    std::vector<std::string> message {parse_bulk_string(buffer)};
+    std::string response {echo_command(message)};
+    std::cout << response << std::endl;
+    send(client_fd, response.c_str(), response.size(), 0);
+
   }
 
   close(client_fd);
