@@ -61,7 +61,7 @@ void handle_client(int client_fd)
     if (bytes_received <= 0){
       std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
     }
-
+    std::cout << "Processing message..." << std::endl;
     std::vector<std::string> message {buffer};
     std::string response {echo_command(message)};
     std::cout << response << std::endl;
