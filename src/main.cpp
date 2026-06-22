@@ -47,7 +47,7 @@ std::string echo_command(std::vector<std::string>& parsed_message)
         response += parsed_message[index] + padding;
     }
   } else {
-    response = "$4\r\nPONG\r\n";
+    response = "PONG";
   }
 
   return response;
