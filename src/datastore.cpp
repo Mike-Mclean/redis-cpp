@@ -17,6 +17,14 @@ class Datastore
         return "Key not found";
     }
 
+    bool has_key(const std::string& key)
+    {
+        if (m_datastore.find(key) != m_datastore.end())
+            return true;
+
+        return false
+    }
+
     private:
 
     std::unordered_map<std::string, std::string> m_datastore;
