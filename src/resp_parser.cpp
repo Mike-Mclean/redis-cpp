@@ -64,7 +64,9 @@ std::string handle_get(const std::vector<std::string>& key_details, Datastore& d
     full_key += " " + key_details[kd_idx];
 
   if (data.has_key(full_key)){
-    std::string response { data.get(full_key) };
+    std::string value { data.get(full_key) };
+    std::string response { "$" };
+    response += std::to_string(value.length()) + "\r\n" + value + "\r\n";
     return response;
   } else {
     return "$-1\r\n";
