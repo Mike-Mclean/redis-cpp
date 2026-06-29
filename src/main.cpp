@@ -11,8 +11,9 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
-#include "resp_parser"
-#include "datastore"
+#include "resp_parser.cpp"
+#include "datastore.h"
+#include <functional>
 
 void handle_client(int client_fd, Datastore& data)
 {
@@ -28,7 +29,7 @@ void handle_client(int client_fd, Datastore& data)
 
     std::cout << "Processing message..." << std::endl;
     std::vector<std::string> message {parse_bulk_string(buffer)};
-    std::string response {handle_received(message)};
+    std::string response {handle_received(message, data)};
     std::cout << response << std::endl;
     send(client_fd, response.c_str(), response.size(), 0);
 
@@ -84,7 +85,7 @@ int main(int argc, char **argv) {
 
     int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
 
-    std::thread worker(handle_client, client_fd, data);
+    std::thread worker(handle_client, client_fd, std::ref(data));
     worker.detach();
 
   }
