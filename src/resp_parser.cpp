@@ -4,11 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include "datastore.h"
-
-struct ParsedCommand {
-  std::string type;
-  std::vector<std::string> details;
-};
+#include "resp_parser.h"
 
 std::vector<std::string> parse_bulk_string(const std::string& message)
 {
