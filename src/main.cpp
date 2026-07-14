@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include "resp_parser.h"
 #include "datastore.h"
+#include "command_handlers.h"
 #include <functional>
 
 void handle_client(int client_fd, Datastore& data)
@@ -89,7 +90,6 @@ int main(int argc, char **argv) {
     worker.detach();
 
   }
-
 
   close(server_fd);
 
