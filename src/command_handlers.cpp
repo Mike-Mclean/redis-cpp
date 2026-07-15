@@ -51,7 +51,7 @@ std::string handle_get(const std::vector<std::string>& key_details, Datastore& d
   }
 }
 
-std::string handle_received(const std::vector<std::string>& parsed_received_message, Datastore& data)
+std::string handle_received(std::vector<std::string>& parsed_received_message, Datastore& data)
 {
 
   std::string response {};
