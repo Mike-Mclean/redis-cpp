@@ -10,6 +10,6 @@ struct ParsedCommand {
 
 std::vector<std::string> parse_bulk_string(const std::string& message);
 
-ParsedCommand parse_command_details(const std::vector<std::string>& command_details);
+ParsedCommand parse_command_details(std::vector<std::string>& command_details);
 
 #endif
