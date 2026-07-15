@@ -19,7 +19,7 @@ class Datastore
 
         Datastore() = default;
 
-        void set(std::string_view key, std::string_view value, std::optional<int> expiry)
+        void set(std::string_view key, std::string_view value, std::optional<int> expiry = std::nullopt)
         {
             MapValue data;
             data.value = value;

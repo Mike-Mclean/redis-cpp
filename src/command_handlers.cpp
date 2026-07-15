@@ -19,19 +19,20 @@ std::string handle_set(const std::vector<std::string>& pair_details, Datastore& 
 {
   std::string key {pair_details[0]};
   std::string value {pair_details[1]};
-  int expiry {-1};
 
   if (pair_details.size() > 2)
   {
     std::string expiry_type {pair_details[2]};
-    expiry = std::stoi(pair_details[3]);
+    int expiry = std::stoi(pair_details[3]);
     if (expiry_type == "ex")
     {
       expiry *= 1000;
     }
-
+    data.set(key, value, expiry);
+  } else {
+    data.set(key, value);
   }
-  data.set(key, value, expiry);
+
   return "+OK\r\n";
 }
 
