@@ -38,9 +38,8 @@ class Datastore
         {
             if (m_datastore.find(key) != m_datastore.end()){
                 MapValue val {m_datastore[key]};
-                if (std::chrono::steady_clock::now() >= val.expiry.value())
-                {
-                    return false;
+                if (val.expiry.has_value() && std::chrono::steady_clock::now() >= val.expiry.value()){
+                        return false;
                 }
                 return true;
             }
