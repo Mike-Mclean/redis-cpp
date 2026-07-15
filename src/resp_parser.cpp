@@ -30,7 +30,7 @@ ParsedCommand parse_command_details(const std::vector<std::string>& command_deta
 {
   ParsedCommand newCommand;
   for (auto& detail : command_details){
-    std::transform(command_details.begin(), command_details.end(), command_details.begin(), [](unsigned char c){
+    std::transform(detail.begin(), detail.end(), detail.begin(), [](unsigned char c){
       return std::tolower(c);
     });
   }
