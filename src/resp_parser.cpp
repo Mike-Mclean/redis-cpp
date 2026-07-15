@@ -26,7 +26,7 @@ std::vector<std::string> parse_bulk_string(const std::string& message)
   return message_details;
 }
 
-ParsedCommand parse_command_details(const std::vector<std::string>& command_details)
+ParsedCommand parse_command_details(std::vector<std::string>& command_details)
 {
   ParsedCommand newCommand;
   std::for_each(command_details.begin(), command_details.end(), [](std::string& s) {
