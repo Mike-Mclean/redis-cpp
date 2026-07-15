@@ -29,8 +29,12 @@ std::vector<std::string> parse_bulk_string(const std::string& message)
 ParsedCommand parse_command_details(const std::vector<std::string>& command_details)
 {
   ParsedCommand newCommand;
-  std::transform(command_details.begin(), command_details.end(), command_details.begin(), [](unsigned char c)
-                {return std::tolower(c);});
+  for (auto& detail : command_details){
+    std::transform(command_details.begin(), command_details.end(), command_details.begin(), [](unsigned char c){
+      return std::tolower(c);
+    });
+  }
+
   std::string command_type { command_details[2] };
 
   newCommand.type = command_type;
