@@ -11,7 +11,7 @@ std::string handle_set(const std::vector<std::string>& pair_details, Datastore& 
 
 std::string handle_get(const std::vector<std::string>& key_details, Datastore& data);
 
-std::string handle_received(const std::vector<std::string>& parsed_received_message, Datastore& data);
+std::string handle_received(std::vector<std::string>& parsed_received_message, Datastore& data);
 
 
 #endif
