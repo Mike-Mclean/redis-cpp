@@ -1,33 +1,81 @@
 [![progress-banner](https://backend.codecrafters.io/progress/redis/4d853149-b7da-496c-beb4-a653c6b99251)](https://app.codecrafters.io/users/Mike-Mclean?r=2qF)
 
-This is a starting point for C++ solutions to the
-["Build Your Own Redis" Challenge](https://codecrafters.io/challenges/redis).
+# codecrafters-redis-cpp
 
-In this challenge, you'll build a toy Redis clone that's capable of handling
-basic commands like `PING`, `SET` and `GET`. Along the way we'll learn about
-event loops, the Redis protocol and more.
+A Redis server implementation in C++20, built as part of CodeCrafters'
+["Build Your Own Redis"](https://codecrafters.io/challenges/redis) challenge.
+It speaks the RESP protocol, handles concurrent clients over TCP, and
+implements a subset of the Redis command set backed by an in-memory
+key/value store.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+## Features
 
-# Passing the first stage
+- Custom RESP (REdis Serialization Protocol) parser
+- TCP server accepting multiple concurrent clients (one thread per connection)
+- In-memory datastore with optional per-key expiry
+- Commands: `PING`, `ECHO`, `SET` (with `EX`/`PX` expiry), `GET`
 
-The entry point for your Redis implementation is in `src/main.cpp`. Study and
-uncomment the relevant code, then run the command below to execute the tests on
-our servers:
+## Project layout
+
+```
+src/
+  main.cpp              # TCP server / connection handling entry point
+  resp_parser.{h,cpp}    # RESP wire format parsing
+  command_handlers.{h,cpp} # Command dispatch and execution
+  datastore.{h,cpp}      # In-memory key/value store
+tests/
+  redis_test.cpp         # Catch2 unit tests
+```
+
+## Requirements
+
+- CMake >= 3.13
+- A C++23-capable compiler
+- [vcpkg](https://vcpkg.io) with `VCPKG_ROOT` set in your environment
+
+Dependencies (`asio`, `pthreads`, `catch2`) are managed via vcpkg — see
+[vcpkg.json](vcpkg.json).
+
+## Building and running
+
+```sh
+./your_program.sh
+```
+
+This configures the project with CMake (using the vcpkg toolchain file),
+builds it, and runs the resulting `redis` server on port `6379`.
+
+Equivalently, you can drive CMake directly:
+
+```sh
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
+cmake --build build
+./build/redis
+```
+
+Once running, interact with it using `redis-cli` or `nc`:
+
+```sh
+redis-cli -p 6379 PING
+redis-cli -p 6379 SET foo bar EX 10
+redis-cli -p 6379 GET foo
+```
+
+## Testing
+
+Unit tests are written with [Catch2](https://github.com/catchorg/Catch2) and
+built as a separate `tests` target.
+
+```sh
+./build/tests                                # run directly, verbose output
+ctest --test-dir build --output-on-failure   # via CTest, pass/fail summary
+```
+
+## Submitting to CodeCrafters
 
 ```sh
 codecrafters submit
 ```
 
-That's all!
-
-# Stage 2 & beyond
-
-Note: This section is for stages 2 and beyond.
-
-1. Ensure you have `cmake` installed locally
-1. Run `./your_program.sh` to run your Redis server, which is implemented in
-   `src/main.cpp`.
-1. Run `codecrafters submit` to submit your solution to CodeCrafters. Test
-   output will be streamed to your terminal.
+Test output streams to your terminal. See [codecrafters.yml](codecrafters.yml)
+for build configuration.
