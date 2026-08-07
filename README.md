@@ -1,4 +1,4 @@
-redis-cpp
+# redis-cpp
 
 A Redis server implementation in C++20, built as part of CodeCrafters'
 ["Build Your Own Redis"](https://codecrafters.io/challenges/redis) challenge.
