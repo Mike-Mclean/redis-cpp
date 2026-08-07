@@ -1048,3 +1048,4 @@ vcpkg_installed
 
 test.cpp
 test
+commands.txt

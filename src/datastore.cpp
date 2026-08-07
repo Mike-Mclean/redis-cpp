@@ -1,7 +1,12 @@
 #include "datastore.h"
 #include <string>
+#include <unordered_map>
+#include <string_view>
+#include <mutex>
+#include <chrono>
+#include <optional>
 
-void Datastore::set(std::string_view key, std::string_view value, std::optional<int> expiry = std::nullopt){
+void Datastore::set(std::string_view key, std::string_view value, std::optional<int> expiry){
     MapValue data;
     data.value = value;
     if (expiry.has_value())
