@@ -1,6 +1,4 @@
-[![progress-banner](https://backend.codecrafters.io/progress/redis/4d853149-b7da-496c-beb4-a653c6b99251)](https://app.codecrafters.io/users/Mike-Mclean?r=2qF)
-
-# codecrafters-redis-cpp
+redis-cpp
 
 A Redis server implementation in C++20, built as part of CodeCrafters'
 ["Build Your Own Redis"](https://codecrafters.io/challenges/redis) challenge.
