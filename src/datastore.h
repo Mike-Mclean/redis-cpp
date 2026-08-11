@@ -19,9 +19,8 @@ class Datastore
 
         Datastore() = default;
 
-        void set(std::string_view key, std::string_view value, std::optional<int> expiry = std::nullopt);
-        std::string get(const std::string& key);
-        bool has_key(const std::string& key);
+        void set(std::string key, std::string value, std::optional<int> expiry = std::nullopt);
+        std::optional<std::string> get_map_value(const std::string& key) const;
 
     private:
 

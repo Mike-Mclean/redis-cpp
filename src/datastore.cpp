@@ -6,26 +6,18 @@
 #include <chrono>
 #include <optional>
 
-void Datastore::set(std::string_view key, std::string_view value, std::optional<int> expiry){
+void Datastore::set(std::string key, std::string value, std::optional<int> expiry){
     MapValue data;
-    data.value = value;
+    data.value = std::move(value);
     if (expiry.has_value())
         data.expiry = std::chrono::steady_clock::now() + std::chrono::milliseconds(expiry.value());
-    m_datastore.emplace(key, data);
+    m_datastore.insert_or_assign(std::move(key), std::move(data));
 }
 
-std::string Datastore::get(const std::string& key){
-    MapValue val {m_datastore[key]};
-    return val.value;
-}
-
-bool Datastore::has_key(const std::string& key){
-    if (m_datastore.find(key) != m_datastore.end()){
-        MapValue val {m_datastore[key]};
-        if (val.expiry.has_value() && std::chrono::steady_clock::now() >= val.expiry.value()){
-                return false;
-        }
-        return true;
+std::optional<std::string> Datastore::get_map_value(const std::string& key) const {
+    auto it = m_datastore.find(key);
+    if (it != m_datastore.end()){
+        return it->second.value;
     }
-    return false;
+    return std::nullopt;
 }
