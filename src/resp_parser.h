@@ -8,7 +8,7 @@ struct ParsedCommand {
   std::vector<std::string> details;
 };
 
-std::vector<std::string> parse_bulk_string(const std::string& message);
+std::string parse_bulk_string(const std::string& message);
 
 ParsedCommand parse_command_details(std::vector<std::string>& command_details);
 

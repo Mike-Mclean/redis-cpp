@@ -3,27 +3,33 @@
 #include <cstring>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 #include "datastore.h"
 #include "resp_parser.h"
 
-std::vector<std::string> parse_bulk_string(const std::string& message)
+std::string parse_bulk_string(const std::string& message)
 {
-  std::string crlf {"\r\n"};
-  std::vector<std::string> message_details;
+  std::istringstream stream(message);
 
-  size_t start {0};
-  std::string token {};
-  size_t pos {message.find(crlf, start)};
+  char prefix;
+  if (!stream.get(prefix) || prefix != '$')
+    throw std::runtime_error{"Invlaid type, expecting bulk strings only"};
 
-  while (pos != std::string::npos)
-  {
-    token = message.substr(start, (pos - start));
-    message_details.push_back(token);
-    start = pos + crlf.length();
-    pos = message.find(crlf, start);
+  int length {};
+  if (!(stream >> length))
+    throw std::runtime_error{"Failed to parse bulk string length"};
+
+  std::string payload {};
+
+  //consume /r/n
+  stream.get();
+  stream.get();
+
+  for (size_t i {}; i < length; i++) {
+    payload.push_back(stream.get());
   }
 
-  return message_details;
+  return payload;
 }
 
 ParsedCommand parse_command_details(std::vector<std::string>& command_details)

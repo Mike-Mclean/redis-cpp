@@ -6,8 +6,8 @@
 #include <string>
 
 TEST_CASE("bulk strings parse correctly", "[parse_bulk_string]"){
-    std::string ping {"*1\r\n$4\r\nPING\r\n"};
-    std::vector<std::string> expected {"*1", "$4", "PING"};
+    std::string ping {"$4\r\nPING\r\n"};
+    std::string expected {"PING"};
     REQUIRE(parse_bulk_string(ping) == expected);
 }
 
@@ -57,7 +57,7 @@ TEST_CASE("Handler returns PONG from PING request", "[handle_received]") {
 TEST_CASE("datastore stores and retrieves a value", "[datastore]") {
     Datastore ds;
     ds.set("key", "value");
-    REQUIRE(ds.get("key") == "value");
+    REQUIRE(ds.get_map_value("key") == "value");
 }
 
 TEST_CASE("set command is handled correctly", "[handle_set]"){
