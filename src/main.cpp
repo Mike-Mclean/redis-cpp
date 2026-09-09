@@ -16,28 +16,7 @@
 #include "command_handlers.h"
 #include <functional>
 
-void handle_client(int client_fd, Datastore& data)
-{
-  char buffer[1024];
-  std::cout << "[Thread " << std::this_thread::get_id() <<"] Client Conneted via socket: " << client_fd << std::endl;
-
-  while(true){
-    std::memset(buffer, 0, sizeof(buffer));
-    int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
-    if (bytes_received <= 0){
-      std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
-    }
-
-    std::cout << "Processing message..." << std::endl;
-    std::vector<std::string> message {parse_bulk_string(buffer)};
-    std::string response {handle_received(message, data)};
-    std::cout << response << std::endl;
-    send(client_fd, response.c_str(), response.size(), 0);
-
-  }
-
-  close(client_fd);
-}
+void handle_client(int client_fd, Datastore& data);
 
 int main(int argc, char **argv) {
   // Flush after every std::cout / std::cerr
@@ -94,4 +73,26 @@ int main(int argc, char **argv) {
   close(server_fd);
 
   return 0;
+}
+
+void handle_client(int client_fd, Datastore& data)
+{
+  char buffer[1024];
+  std::cout << "[Thread " << std::this_thread::get_id() <<"] Client Conneted via socket: " << client_fd << std::endl;
+
+  while(true){
+    std::memset(buffer, 0, sizeof(buffer));
+    int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
+    if (bytes_received <= 0){
+      std::cout << "[Thread " << std::this_thread::get_id() <<"] Client disconnected or error occured";
+      close(client_fd);
+      break;
+    }
+    std::cout << "Processing message..." << std::endl;
+    std::vector<std::string> message {parse_bulk_string(buffer)};
+    std::string response {handle_received(message, data)};
+    std::cout << response << std::endl;
+    send(client_fd, response.c_str(), response.size(), 0);
+  }
+
 }

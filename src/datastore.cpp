@@ -7,6 +7,7 @@
 #include <optional>
 
 void Datastore::set(std::string key, std::string value, std::optional<int> expiry){
+    std::unique_lock<std::shared_mutex> lock(map_mutex);
     MapValue data;
     data.value = std::move(value);
     if (expiry.has_value())
@@ -15,6 +16,7 @@ void Datastore::set(std::string key, std::string value, std::optional<int> expir
 }
 
 std::optional<std::string> Datastore::get_map_value(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(map_mutex);
     auto it = m_datastore.find(key);
     if (it != m_datastore.end()){
         return it->second.value;
