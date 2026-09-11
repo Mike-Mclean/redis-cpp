@@ -7,30 +7,82 @@
 #include "datastore.h"
 #include "resp_parser.h"
 
-std::string parse_bulk_string(const std::string& message)
+respInput readInput(std::istringstream& message)
 {
-  std::istringstream stream(message);
-
   char prefix;
-  if (!stream.get(prefix) || prefix != '$')
-    throw std::runtime_error{"Invlaid type, expecting bulk strings only"};
 
-  int length {};
+  if (!message.get(prefix))
+    throw std::runtime_error{"Could not parse input"};
+
+  switch (prefix)
+  {
+  case RESP_ARRAY:
+    return parse_resp_array(message);
+    break;
+
+  case RESP_BULK_STR:
+    return parse_bulk_string(message);
+    break;
+
+  default:
+    throw std::runtime_error{"Unknown type message type"};
+    break;
+  }
+}
+
+respInput parse_bulk_string(std::istringstream& stream)
+{
+
+  int length;
   if (!(stream >> length))
     throw std::runtime_error{"Failed to parse bulk string length"};
-
-  std::string payload {};
+  if (length < 0)
+  {
+    respInput nullInput;
+    nullInput.type = RESP_BULK_STR;
+    nullInput.str = "";
+    return nullInput;
+  }
 
   //consume /r/n
   stream.get();
   stream.get();
 
-  for (size_t i {}; i < length; i++) {
-    payload.push_back(stream.get());
+  std::string payload(length, '\0');
+  if (!stream.read(payload.data(), length))
+    throw std::runtime_error{"Malformed bulk string"};
+
+  //consume trailing /r/n
+  stream.get();
+  stream.get();
+
+  respInput value;
+  value.str = payload;
+  value.type = RESP_BULK_STR;
+
+  return value;
+}
+
+respInput parse_resp_array(std::istringstream& message)
+{
+
+  int length;
+  if (!(message >> length))
+    throw std::runtime_error{"Failed to parse RESP array length"};
+
+  respInput value;
+  value.type = RESP_ARRAY;
+
+  for (size_t i {}; i < length; i++)
+  {
+    respInput array_value = readInput(message);
+    value.array.push_back(array_value);
   }
 
-  return payload;
+  return value;
+
 }
+
 
 ParsedCommand parse_command_details(std::vector<std::string>& command_details)
 {

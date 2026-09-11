@@ -6,10 +6,13 @@
 #include <string>
 
 TEST_CASE("bulk strings parse correctly", "[parse_bulk_string]"){
-    std::string ping {"$4\r\nPING\r\n"};
+    std::istringstream ping {"$4\r\nPING\r\n"};
     std::string expected {"PING"};
-    REQUIRE(parse_bulk_string(ping) == expected);
+    respInput parsed_input {readInput(ping)};
+    REQUIRE(parsed_input.str == expected);
 }
+
+TEST_CASE("RESP arrays are parsed correctly")
 
 TEST_CASE("command details are parsed correctly", "[parse_command_details]"){
 
