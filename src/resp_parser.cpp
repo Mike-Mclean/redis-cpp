@@ -38,9 +38,7 @@ respInput parse_bulk_string(std::istringstream& stream)
     throw std::runtime_error{"Failed to parse bulk string length"};
   if (length < 0)
   {
-    respInput nullInput;
-    nullInput.type = RESP_BULK_STR;
-    nullInput.str = "";
+    respInput nullInput {.type = RESP_BULK_STR, .str = ""};
     return nullInput;
   }
 
@@ -70,6 +68,16 @@ respInput parse_resp_array(std::istringstream& message)
   if (!(message >> length))
     throw std::runtime_error{"Failed to parse RESP array length"};
 
+  if (length < 0)
+  {
+    respInput nullArray{.type = RESP_ARRAY, .array = {}};
+    return nullArray;
+  }
+
+  //consume \r\n
+  message.get();
+  message.get();
+
   respInput value;
   value.type = RESP_ARRAY;
 
@@ -81,23 +89,4 @@ respInput parse_resp_array(std::istringstream& message)
 
   return value;
 
-}
-
-
-ParsedCommand parse_command_details(std::vector<std::string>& command_details)
-{
-  ParsedCommand newCommand;
-  std::string command_type = command_details[2];
-  std::transform(command_type.begin(), command_type.end(), command_type.begin(), [](unsigned char c){
-    return std::tolower(c);
-  });
-
-  newCommand.type = command_type;
-
-  for (size_t detail_idx {4}; detail_idx < command_details.size(); detail_idx += 2)
-  {
-      newCommand.details.push_back(command_details[detail_idx]);
-  }
-
-  return newCommand;
 }

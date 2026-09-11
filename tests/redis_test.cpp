@@ -12,7 +12,19 @@ TEST_CASE("bulk strings parse correctly", "[parse_bulk_string]"){
     REQUIRE(parsed_input.str == expected);
 }
 
-TEST_CASE("RESP arrays are parsed correctly")
+TEST_CASE("RESP arrays are parsed correctly", "[parse_resp_array]"){
+    std::istringstream resp_array {"*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n"};
+    respInput test_input {readInput(resp_array)};
+
+    respInput echo {.type = RESP_BULK_STR, .str = "ECHO"};
+    respInput hey {.type = RESP_BULK_STR, .str = "hey"};
+    std::vector<respInput> array_info {echo, hey};
+    respInput expected {.type = RESP_ARRAY, .array = array_info};
+
+    CAPTURE(test_input.array[0].str, test_input.array[1].str);
+
+    REQUIRE(test_input == expected);
+}
 
 TEST_CASE("command details are parsed correctly", "[parse_command_details]"){
 

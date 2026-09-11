@@ -11,20 +11,15 @@ inline constexpr char RESP_ERROR = '-';
 inline constexpr char RESP_INTEGER = ':';
 
 struct respInput {
-  std::string type;
+  char type;
   std::string str;
   std::vector<respInput> array;
-};
 
-struct ParsedCommand {
-  std::string type;
-  std::vector<std::string> details;
+  auto operator<=>(const respInput&) const = default;
 };
 
 respInput readInput(std::istringstream& message);
 respInput parse_bulk_string(std::istringstream& stream);
 respInput parse_resp_array(std::istringstream& message);
-
-ParsedCommand parse_command_details(std::vector<std::string>& command_details);
 
 #endif
