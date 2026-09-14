@@ -21,37 +21,22 @@ TEST_CASE("RESP arrays are parsed correctly", "[parse_resp_array]"){
     std::vector<respInput> array_info {echo, hey};
     respInput expected {.type = RESP_ARRAY, .array = array_info};
 
-    CAPTURE(test_input.array[0].str, test_input.array[1].str);
-
     REQUIRE(test_input == expected);
 }
 
-TEST_CASE("command details are parsed correctly", "[parse_command_details]"){
+TEST_CASE("Array of RESP arrays are parsed correctly", "[parse_array_of_arrays]"){
+    std::istringstream resp_array {"*1\r\n*2\r\n$4\r\nEcho\r\n$5\r\nHello\r\n"};
+    respInput test_input {readInput(resp_array)};
 
-    SECTION("ping commands are parsed correctly") {
-        std::vector<std::string> ping {"*1", "$4", "PING"};
-        ParsedCommand expected {"ping", {}};
-        ParsedCommand details {parse_command_details(ping)};
-        REQUIRE(expected.type == details.type);
-        REQUIRE_THAT(expected.details, Catch::Matchers::RangeEquals(details.details));
-    }
+    respInput echo {.type = RESP_BULK_STR, .str = "ECHO"};
+    respInput hello {.type = RESP_BULK_STR, .str = "Hello"};
+    std::vector<respInput> array_info {echo, hello};
+    respInput expected_sub {.type = RESP_ARRAY, .array = array_info};
+    std::vector<respInput> expected_array {expected_sub};
 
-    SECTION("echo commands are parsed correctly"){
-        std::vector<std::string> hey {"*2", "$4", "ECHO", "$3", "hey"};
-        ParsedCommand expected {"echo", {"hey"}};
-        ParsedCommand details {parse_command_details(hey)};
-        REQUIRE(expected.type == details.type);
-        REQUIRE_THAT(expected.details, Catch::Matchers::RangeEquals(details.details));
-    }
+    respInput expected {.type = RESP_ARRAY, .array = expected_array};
 
-    SECTION("set commands are parsed correctly") {
-        std::vector<std::string> ds_set {"*3", "$3", "SET", "$3", "foo", "$3", "bar"};
-        ParsedCommand expected {"set", {"foo", "bar"}};
-        ParsedCommand details {parse_command_details(ds_set)};
-        REQUIRE(expected.type == details.type);
-        REQUIRE_THAT(expected.details, Catch::Matchers::RangeEquals(details.details));
-    }
-
+    REQUIRE(test_input == expected);
 }
 
 TEST_CASE("echo is handled correctly", "[handle_echo]"){

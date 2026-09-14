@@ -5,8 +5,36 @@
 #include <optional>
 #include "datastore.h"
 #include "resp_parser.h"
+#include "command_handlers.h"
 
-std::string handle_echo(const std::string& echo_message)
+std::string handle_received(respInput& parsed_command, Datastore& data)
+{
+
+  std::string response {};
+  redisCommand command {extract_command(parsed_command)};
+
+  switch (command.type)
+  {
+  case Commands::ECHO:
+    response = handle_echo(command.args);
+    break;
+  case Commands::SET:
+    response = handle_set(command.args, data);
+    break;
+  case Commands::GET:
+    response = handle_get(command.args, data);
+    break;
+  case Commands::PING:
+    response = handle_ping();
+    break;
+
+  default:
+    throw std::runtime_error{"Unkown command"};
+  }
+  return response;
+}
+
+std::string handle_echo(const std::vector<std::string>& echo_message)
 {
   std::string padding {"\r\n"};
   size_t message_size {echo_message.length()};
@@ -59,22 +87,9 @@ std::string handle_get(const std::vector<std::string>& key_details, Datastore& d
   }
 }
 
-std::string handle_received(std::vector<std::string>& parsed_received_message, Datastore& data)
+
+redisCommand extract_command(respInput& parsed_input)
 {
-
-  std::string response {};
-  ParsedCommand command {parse_command_details(parsed_received_message)};
-
-  if (command.type == "echo"){
-    response = handle_echo(command.details[0]);
-  } else if (command.type == "set"){
-    response = handle_set(command.details, data);
-  } else if (command.type == "get"){
-    response = handle_get(command.details, data);
-  } else{
-    // Response for a PING
-    response = "+PONG\r\n";
-  }
-
-  return response;
+  
 }
+

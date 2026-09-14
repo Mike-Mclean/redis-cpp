@@ -15,6 +15,7 @@
 #include "datastore.h"
 #include "command_handlers.h"
 #include <functional>
+#include <sstream>
 
 void handle_client(int client_fd, Datastore& data);
 
@@ -91,7 +92,8 @@ void handle_client(int client_fd, Datastore& data)
       break;
     }
     std::cout << "Processing message..." << std::endl;
-    std::vector<std::string> message {parse_bulk_string(buffer)};
+    std::istringstream(buffer);
+    respInput message {parse_bulk_string(buffer)};
     std::string response {handle_received(message, data)};
     std::cout << response << std::endl;
     send(client_fd, response.c_str(), response.size(), 0);
