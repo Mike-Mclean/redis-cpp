@@ -13,35 +13,29 @@ std::string handle_received(respInput& parsed_command, Datastore& data)
   std::string response {};
   redisCommand command {extract_command(parsed_command)};
 
-  switch (command.type)
-  {
-  case Commands::ECHO:
+  if (command.type == "ECHO") {
     response = handle_echo(command.args);
-    break;
-  case Commands::SET:
+  } else if (command.type == "SET") {
     response = handle_set(command.args, data);
-    break;
-  case Commands::GET:
+  } else if (command.type == "GET") {
     response = handle_get(command.args, data);
-    break;
-  case Commands::PING:
+  } else if (command.type == "PING"){
     response = handle_ping();
-    break;
-
-  default:
-    throw std::runtime_error{"Unkown command"};
+  } else {
+    throw std::runtime_error{"Unknown command"};
   }
+
   return response;
 }
 
-std::string handle_echo(const std::vector<std::string>& echo_message)
+std::string handle_echo(const std::vector<std::string>& echo_arg)
 {
-  std::string padding {"\r\n"};
-  size_t message_size {echo_message.length()};
+  if (echo_arg.size() > 1){
+    throw std::runtime_error{"Too many arguments to ECHO command"};
+  }
 
-  std::string response {"$" + std::to_string(message_size) + padding + echo_message + padding};
+  return "$" + std::to_string(echo_arg[0].size()) + "\r\n" + echo_arg[0] + "\r\n"
 
-  return response;
 }
 
 std::string handle_set(const std::vector<std::string>& pair_details, Datastore& data)
@@ -90,6 +84,17 @@ std::string handle_get(const std::vector<std::string>& key_details, Datastore& d
 
 redisCommand extract_command(respInput& parsed_input)
 {
-  
+  redisCommand command;
+
+  command.type = parsed_input.array[0].str;
+
+  //Arguments start at i = 1 in the array
+  for (size_t i {1}; i < parsed_input.array.size(); i++)
+  {
+    command.args.push_back(parsed_input.array[i].str);
+  }
+
+  return command;
+
 }
 

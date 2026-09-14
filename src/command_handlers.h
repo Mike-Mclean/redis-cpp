@@ -5,15 +5,10 @@
 #include <string>
 #include "datastore.h"
 
-enum class Commands{
-    PING, ECHO, GET, SET
-};
-
 struct redisCommand {
-    Commands type;
+    std::string type;
     std::vector<std::string> args;
 };
-
 
 std::string handle_echo(const std::string& echo_message);
 
