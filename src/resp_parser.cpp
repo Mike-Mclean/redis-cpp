@@ -25,7 +25,7 @@ respInput readInput(std::istringstream& message)
     break;
 
   default:
-    throw std::runtime_error{"Unknown type message type"};
+    throw std::runtime_error{"Unknown message type"};
     break;
   }
 }

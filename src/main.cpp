@@ -92,11 +92,20 @@ void handle_client(int client_fd, Datastore& data)
       break;
     }
     std::cout << "Processing message..." << std::endl;
-    std::istringstream(buffer);
-    respInput message {parse_bulk_string(buffer)};
-    std::string response {handle_received(message, data)};
-    std::cout << response << std::endl;
-    send(client_fd, response.c_str(), response.size(), 0);
+
+    std::istringstream stream(buffer);
+    try
+    {
+      respInput message {readInput(stream)};
+      std::string response {handle_received(message, data)};
+      std::cout << response << std::endl;
+      send(client_fd, response.c_str(), response.size(), 0);
+    }
+    catch(const std::exception& e)
+    {
+      std::string err {"-ERR " + std::string{e.what()} + "\r\n"};
+      send(client_fd, err.c_str(), err.size(), 0);
+    }
   }
 
 }
