@@ -28,39 +28,27 @@ std::string handle_received(respInput& parsed_command, Datastore& data)
   return response;
 }
 
-std::string handle_echo(const std::vector<std::string>& echo_arg)
+std::string handle_echo(const std::vector<std::string>& echo_args)
 {
-  if (echo_arg.size() > 1){
+  if (echo_args.size() > 1){
     throw std::runtime_error{"Too many arguments to ECHO command"};
   }
-
-  return "$" + std::to_string(echo_arg[0].size()) + "\r\n" + echo_arg[0] + "\r\n"
-
+  return "$" + std::to_string(echo_args[0].size()) + "\r\n" + echo_args[0] + "\r\n";
 }
 
-std::string handle_set(const std::vector<std::string>& pair_details, Datastore& data)
+std::string handle_set(const std::vector<std::string>& set_args, Datastore& data)
 {
-  std::string key {pair_details[0]};
-  std::string value {pair_details[1]};
+  SetOptions set_details {parse_set_args(set_args)};
 
-
-  if (pair_details.size() > 2)
+  if (set_details.expiry)
   {
-    int expiry;
-    std::string expiry_type {pair_details[2]};
-    try {
-      expiry = std::stoi(pair_details[3]);
-    } catch (const std::exception&) {
-      std::cerr << "Error: Not a valid number.\n";
-      return "-ERR value is not an integer or out of range\r\n";
-    }
-    if (expiry_type == "ex")
-    {
-      expiry *= 1000;
-    }
-    data.set(key, value, expiry);
+
+    data.set(set_details.key, set_details.value, set_details.expiry);
+
   } else {
-    data.set(key, value);
+
+    data.set(set_details.key, set_details.value);
+
   }
 
   return "+OK\r\n";
@@ -81,11 +69,9 @@ std::string handle_get(const std::vector<std::string>& key_details, Datastore& d
   }
 }
 
-
 redisCommand extract_command(respInput& parsed_input)
 {
   redisCommand command;
-
   command.type = parsed_input.array[0].str;
 
   //Arguments start at i = 1 in the array
@@ -95,6 +81,39 @@ redisCommand extract_command(respInput& parsed_input)
   }
 
   return command;
-
 }
 
+SetOptions parse_set_args(const std::vector<std::string>& args)
+{
+
+  if (args.size() > 4)
+    throw std::runtime_error{"Invalid number of arguments for set command"};
+  if (args.size() < 2)
+    throw std::runtime_error{"Too few arguments for set command"};
+  if (args.size() == 3)
+    throw std::runtime_error{"Missing expiry time for EX or PX option"};
+
+  SetOptions set {.key = args[0], .value = args[1]};
+
+  if (args.size() > 2)
+  {
+    std::string expiry_type {args[2]};
+
+    try {
+
+      int expiry {std::stoi(args[3])};
+      if (expiry_type == "EX")
+        expiry *= 1000;
+
+      set.expiry = expiry;
+
+    } catch (const std::exception&) {
+
+      throw std::runtime_error{"expiry value is not an integer or is out of range"};
+
+    }
+  }
+
+  return set;
+
+}
