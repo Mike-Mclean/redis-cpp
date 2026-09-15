@@ -7,7 +7,7 @@
 #include "resp_parser.h"
 #include "command_handlers.h"
 
-std::string handle_received(respInput& parsed_command, Datastore& data)
+std::string handle_received(respInput parsed_command, Datastore& data)
 {
 
   std::string response {};

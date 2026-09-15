@@ -16,10 +16,10 @@ struct SetOptions {
     std::optional<int> expiry;
 };
 
-std::string handle_echo(const std::string& echo_message);
-std::string handle_set(const std::vector<std::string>& pair_details, Datastore& data);
-std::string handle_get(const std::vector<std::string>& key_details, Datastore& data);
-std::string handle_received(std::vector<std::string>& parsed_received_message, Datastore& data);
+std::string handle_echo(const std::vector<std::string>& echo_args);
+std::string handle_set(const std::vector<std::string>& set_args, Datastore& data);
+std::string handle_get(const std::vector<std::string>& get_args, Datastore& data);
+std::string handle_received(respInput parsed_command, Datastore& data);
 
 
 redisCommand extract_command(respInput& parsed_input);
